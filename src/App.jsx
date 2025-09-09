@@ -208,7 +208,7 @@ function App() {
 
             {/* Document Comparison View - Side by Side or Unified */}
             {comparisonViewMode === "side-by-side" ? (
-              <div className="grid grid-cols-[1fr_80px_1fr] gap-4 items-stretch">
+              <div className="grid grid-cols-[1fr_80px_1fr] gap-4 items-stretch" style={{ height: '70vh', minHeight: '600px' }}>
                 <DocumentPreview
                   document={leftDocument}
                   diffs={comparison.leftDiffs}
@@ -227,7 +227,7 @@ function App() {
                 />
               </div>
             ) : (
-              <div className="max-w-5xl mx-auto">
+              <div className="max-w-5xl mx-auto" style={{ height: '70vh', minHeight: '600px' }}>
                 <UnifiedComparisonView
                   comparison={comparison}
                   leftDocument={leftDocument}
@@ -327,14 +327,16 @@ function App() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6" style={{ height: '70vh', minHeight: '600px' }}>
               <DocumentPreview
                 document={leftDocument}
                 title="Original Document"
+                containerId="preview-left-container"
               />
               <DocumentPreview
                 document={rightDocument}
                 title="Modified Document"
+                containerId="preview-right-container"
               />
             </div>
           </div>
@@ -353,10 +355,11 @@ function App() {
               </p>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto" style={{ height: '70vh', minHeight: '600px' }}>
               <DocumentPreview
                 document={leftDocument || rightDocument}
                 title={leftDocument ? "Original Document" : "Modified Document"}
+                containerId="single-preview-container"
               />
             </div>
           </div>
