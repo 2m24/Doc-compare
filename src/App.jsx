@@ -5,6 +5,7 @@ import FileUpload from "./components/FileUpload";
 import DocumentPreview from "./components/DocumentPreview";
 import UnifiedMiniMap from "./components/MiniMap";
 import ComparisonSummary from "./components/ComparisonSummary";
+import UnifiedComparisonView from "./components/UnifiedComparisonView";
 import DetailedReport from "./components/DetailedReport";
 import { compareHtmlDocuments } from "./utils/textComparison";
 import {
@@ -19,6 +20,7 @@ function App() {
   const [comparison, setComparison] = useState(null);
   const [viewMode, setViewMode] = useState("preview");
   const [isComparing, setIsComparing] = useState(false);
+  const [comparisonViewMode, setComparisonViewMode] = useState("side-by-side");
   const [showDetailed, setShowDetailed] = useState(false);
 
   const handleDocumentUpload = useCallback((document, position) => {
@@ -108,7 +110,7 @@ function App() {
           {/* Action Buttons */}
           <div className="flex gap-3 justify-center flex-wrap">
             {canCompare && (
-              <div className="flex gap-2 bg-gray-100 rounded-lg p-1">
+              <div className="flex gap-2 bg-gray-100 rounded-lg p-1 mb-2">
                 <button
                   onClick={() => setViewMode("preview")}
                   className={`px-4 py-2 rounded-md font-medium transition-all duration-200 ${
@@ -144,6 +146,33 @@ function App() {
                 )}
               </div>
             )}
+            
+            {/* Comparison View Mode Toggle */}
+            {canCompare && comparison && viewMode === "comparison" && (
+              <div className="flex gap-2 bg-blue-100 rounded-lg p-1 mb-2">
+                <button
+                  onClick={() => setComparisonViewMode("side-by-side")}
+                  className={`px-4 py-2 rounded-md font-medium transition-all duration-200 ${
+                    comparisonViewMode === "side-by-side"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-blue-600 hover:text-blue-800"
+                  }`}
+                >
+                  Side by Side
+                </button>
+                <button
+                  onClick={() => setComparisonViewMode("unified")}
+                  className={`px-4 py-2 rounded-md font-medium transition-all duration-200 ${
+                    comparisonViewMode === "unified"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-blue-600 hover:text-blue-800"
+                  }`}
+                >
+                  Unified View
+                </button>
+              </div>
+            )}
+            
             <button
               onClick={handleCompareDocuments}
               disabled={!canCompare || isComparing}
@@ -177,30 +206,40 @@ function App() {
               onExportPdf={handleExportPdf}
             />
 
-            {/* Document Comparison View */}
-            <div className="grid grid-cols-[1fr_80px_1fr] gap-4 items-stretch">
-              <DocumentPreview
-                document={leftDocument}
-                diffs={comparison.leftDiffs}
-                title="Original Document"
-                containerId="left-preview-container"
-              />
-              <UnifiedMiniMap
-                leftContainerId="left-preview-container"
-                rightContainerId="right-preview-container"
-              />
-              <DocumentPreview
-                document={rightDocument}
-                diffs={comparison.rightDiffs}
-                title="Modified Document"
-                containerId="right-preview-container"
-              />
-            </div>
+            {/* Document Comparison View - Side by Side or Unified */}
+            {comparisonViewMode === "side-by-side" ? (
+              <div className="grid grid-cols-[1fr_80px_1fr] gap-4 items-stretch">
+                <DocumentPreview
+                  document={leftDocument}
+                  diffs={comparison.leftDiffs}
+                  title="Original Document"
+                  containerId="left-preview-container"
+                />
+                <UnifiedMiniMap
+                  leftContainerId="left-preview-container"
+                  rightContainerId="right-preview-container"
+                />
+                <DocumentPreview
+                  document={rightDocument}
+                  diffs={comparison.rightDiffs}
+                  title="Modified Document"
+                  containerId="right-preview-container"
+                />
+              </div>
+            ) : (
+              <div className="max-w-5xl mx-auto">
+                <UnifiedComparisonView
+                  comparison={comparison}
+                  leftDocument={leftDocument}
+                  rightDocument={rightDocument}
+                />
+              </div>
+            )}
 
             {showDetailed && <DetailedReport report={comparison.detailed} />}
 
             {/* Legend */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 ${comparisonViewMode === "unified" ? "hidden" : ""}`}>
               <h4 className="text-sm font-semibold text-gray-700 mb-3">
                 Mutual Comparison Legend
               </h4>
